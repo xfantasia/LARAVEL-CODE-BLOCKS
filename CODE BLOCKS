@@ -1,0 +1,23 @@
+
+//ROUTING CALLS
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/box', function()
+    {
+        echo "Hello";
+    }
+);
+
+Route::get('/hello', function()
+    {
+        $var1 = 'Lulu & Sunshine';
+        return view('components/hello', ['var1' => $var1]);
+    }
+);
