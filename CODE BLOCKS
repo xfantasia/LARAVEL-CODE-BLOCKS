@@ -21,3 +21,154 @@ Route::get('/hello', function()
         return view('components/hello', ['var1' => $var1]);
     }
 );
+
+
+
+//MOST USED QUERY STRING AND VIEW DATA COLLECTION
+//******************** MAIN METHOD ********************/
+    public function main()
+    {
+        $records_category = FileCategoriesModel::all();
+        $dataz = [
+            'data'=>$records_category, 
+            'val2'=>'', 
+            'val3'=>'',
+        ];
+
+            //table join
+            $users = DB::table('table1')
+                        ->join('table2', 'table1.field1', '=', 'table2.field1')
+                        ->join('table3', 'table1.field1', '=', 'table3.field1')
+                        ->select('table1.*', 'table2.any-field', 'table3.any-field')
+                        ->get();
+
+            //between range values
+            $users = DB::table('users')
+                        ->whereBetween('votes', [1, 100])
+                        ->get();
+
+            //not between range values
+            $users = DB::table('users')
+                    ->whereNotBetween('votes', [1, 100])
+                    ->get();
+
+            //where number is contained in a given array
+            $users = DB::table('users')
+                    ->whereIn('id', [1, 2, 3])
+                    ->get();
+
+            //check for NULL fields
+            $users = DB::table('users')
+                    ->whereNull('updated_at')
+                    ->get();
+
+            //check for NOT NULL fields
+            $users = DB::table('users')
+                    ->whereNotNull('updated_at')
+                    ->get();
+
+            //multiple conditions
+            $users = DB::table('users')
+                        ->where('votes', '>', 100)
+                        ->orWhere('name', 'John')
+                        ->get();
+
+            //equals to
+            $users = DB::table('users')->where('votes', '=', 100)->get();
+
+            //greater than or equals
+            $users = DB::table('users')
+                        ->where('votes', '>=', 100)
+                        ->orderBy('name', 'desc')
+                        ->get();
+
+            //not greater than and not less than
+            $users = DB::table('users')
+                        ->where('votes', '<>', 100)
+                        ->orderBy('name', 'desc')
+                        ->get();
+
+            //like with wild cards
+            $users = DB::table('users')
+                        ->where('name', 'like', 'T%')
+                        ->get();
+
+            //select any random user
+            $randomUser = DB::table('users')
+                        ->inRandomOrder()
+                        ->first();
+
+            //group and load records by similar ids or any similar field
+            $users = DB::table('users')
+                        ->groupBy('account_id')
+                        ->having('account_id', '>', 100)
+                        ->orderBy('name', 'desc')
+                        ->get();
+
+            //load records with limist and offset
+            $users = DB::table('users')
+                        ->offset(10)
+                        ->limit(5)
+                        ->get();
+
+
+            //insert records
+            DB::table('users')->insert(
+                ['email' => 'john@example.com', 'votes' => 0]
+            );
+
+            //insert records but avoid duplicates
+            DB::table('users')->insertOrIgnore([
+                ['id' => 1, 'email' => 'taylor@example.com'],
+                ['id' => 2, 'email' => 'dayle@example.com']
+            ]);
+
+            //insert records but capture your last auto increment ID
+            $id = DB::table('users')->insertGetId(
+                ['email' => 'john@example.com', 'votes' => 0]
+            );
+
+            //update records
+            $affected = DB::table('users')
+                        ->where('id', 1)
+                        ->update(['votes' => 1]);
+
+
+            //update records or insert if not existing
+            DB::table('users')
+                        ->updateOrInsert(
+                            ['email' => 'john@example.com', 'name' => 'John'],
+                            ['votes' => '2']
+                        );
+
+            //get single field value record from row
+            $email = DB::table('users')->where('name', 'John')->value('email');
+
+            //get record by id
+            $user = DB::table('users')->find(3);
+
+            //debugging query to see records dumped for analysis
+            DB::table('users')->where('votes', '>', 100)->dd();
+            DB::table('users')->where('votes', '>', 100)->dump();
+
+
+        $exists = DB::table('file_categories')->where('category_id', 'rcp')->exists();//if true, $exist = 1;
+        $max = DB::table('file_categories')->max('category_id');
+        $average = DB::table('file_categories')->where('category_id', 1)->avg('id');
+        $count = DB::table('file_categories')->count();
+
+        
+        $record = DB::table('file_categories')->where('category_id', 'rcp')->first();
+        $records = DB::table('file_categories')->get();
+
+        $data = [
+            'record'=>$record, 
+            'records'=>$records,
+            'count'=>$count,
+            'max'=>$max, 
+            'average'=>$average,
+            'exist'=>$exists,
+        ];
+
+        return view("pages/main",$data);   
+    }
